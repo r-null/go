@@ -37,10 +37,8 @@ func GetLastTaskHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	lastTask := messages[len(messages)-1]
-
-	fmt.Fprintf(w, "Last task name: %s, isDone: %v\n", lastTask.Task, lastTask.IsDone)
-	fmt.Fprintln(w, "============")
-	fmt.Fprintln(w, "total tasks: ", len(messages))
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(lastTask)
 }
 
 func GetAllTaskHandler(w http.ResponseWriter, r *http.Request) {
@@ -70,7 +68,10 @@ func UpdateTaskHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	DB.Create(&Message{Task: reqBody.Message, IsDone: reqBody.IsDone})
+	message := Message{Task: reqBody.Message, IsDone: reqBody.IsDone}
+	DB.Create(&message)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(message)
 }
 
 func main() {
